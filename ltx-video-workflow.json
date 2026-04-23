@@ -1,0 +1,93 @@
+{
+  "1": {
+    "class_type": "LoadImageFromURL",
+    "inputs": {
+      "url": "https://example.com/first-frame.jpg"
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "A vibrant psychedelic art product video, smooth motion, colorful",
+      "clip": ["10", 1]
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "blurry, low quality, distorted, watermark, nsfw",
+      "clip": ["10", 1]
+    }
+  },
+  "5": {
+    "class_type": "EmptyLTXVLatentVideo",
+    "inputs": {
+      "width": 768,
+      "height": 512,
+      "length": 97,
+      "batch_size": 1
+    }
+  },
+  "6": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 42,
+      "steps": 25,
+      "cfg": 3.5,
+      "sampler_name": "euler",
+      "scheduler": "sgm_uniform",
+      "denoise": 1.0,
+      "model": ["10", 0],
+      "positive": ["3", 0],
+      "negative": ["4", 0],
+      "latent_image": ["11", 0]
+    }
+  },
+  "7": {
+    "class_type": "VAEDecodeTiled",
+    "inputs": {
+      "samples": ["6", 0],
+      "vae": ["10", 2],
+      "tile_size": 512,
+      "overlap": 64
+    }
+  },
+  "8": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": ["7", 0],
+      "frame_rate": 24,
+      "loop_count": 0,
+      "filename_prefix": "ltx_video",
+      "format": "video/h264-mp4",
+      "pingpong": false,
+      "save_output": true
+    }
+  },
+  "10": {
+    "class_type": "LTXVLoader",
+    "inputs": {
+      "ckpt_name": "ltx-video-2b-v0.9.5.safetensors",
+      "dtype": "bfloat16"
+    }
+  },
+  "11": {
+    "class_type": "LTXVImgToVideo",
+    "inputs": {
+      "positive": ["3", 0],
+      "negative": ["4", 0],
+      "vae": ["10", 2],
+      "image": ["1", 0],
+      "width": 768,
+      "height": 512,
+      "length": 97,
+      "batch_size": 1
+    }
+  },
+  "12": {
+    "class_type": "UpscaleModelLoader",
+    "inputs": {
+      "model_name": "RealESRGAN_x4plus.pth"
+    }
+  }
+}
